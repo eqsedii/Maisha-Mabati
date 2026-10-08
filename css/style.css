@@ -274,3 +274,7 @@ body.noscroll{overflow:hidden}
 .cno{background:#eceaf4;color:var(--navy)}
 .cyes{background:var(--red);color:#fff;box-shadow:0 10px 22px -8px rgba(223,10,2,.7)}
 .crow button:active{transform:scale(.96)}
+
+.cico{font-size:1.9rem;line-height:1}
+.panel .clr .ti{font-size:1.1rem;line-height:1}
+.panel .clr svg,.cico svg{width:0;height:0}
