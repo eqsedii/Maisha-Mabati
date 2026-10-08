@@ -17,7 +17,13 @@ const COLORS=['Charcoal Grey','Royal Blue','Forest Green','Brick Red','Chocolate
 const G=[['box-blue','Royal blue box profile'],['box-green','Green box profile'],['box-brown','Chocolate brown box profile'],['orange','Orange-red corrugated'],['box-red','Bright red box profile'],['box-dark','Charcoal box profile'],['box-teal','Teal box profile'],['corrugated','Corrugated in three colours'],['box-maroon','Maroon box profile'],['box-white','White box profile'],['box-green2','Forest green box profile'],['tile-charcoal','Charcoal textured tile sheet'],['maroon-ridge-nails','Maroon tile with ridge caps and roofing nails'],['tile-grey','Grey tile profile']];
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const fmt=n=>'Ksh '+n.toLocaleString('en-KE');
+const KEY='maisha_cart_v1';
 let cart=[];
+try{const s=JSON.parse(localStorage.getItem(KEY)||'[]');if(Array.isArray(s))cart=s.filter(k=>P[k.i]&&k.m>0&&(P[k.i].s?P[k.i].s[k.l]:P[k.i].p[k.g]))}catch(e){cart=[]}
+const CK='maisha_cust_v1';
+function saveCust(){try{localStorage.setItem(CK,JSON.stringify({n:$('#cname').value,l:$('#cloc').value}))}catch(e){}}
+function loadCust(){try{const s=JSON.parse(localStorage.getItem(CK)||'{}');$('#cname').value=s.n||'';$('#cloc').value=s.l||''}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(cart))}catch(e){}}
 
 /* loader */
 const L=$('#loader');
@@ -66,19 +72,29 @@ function render(){
  cart.forEach((k,idx)=>{const pr=price(P[k.i],k.g,k.l),s=pr*k.m;t+=s;n++;
   const li=document.createElement('li');
   li.innerHTML=`<span><b>${desc(k)}</b>${k.col} · ${qtxt(k)} × ${fmt(pr)}<br>${fmt(s)}</span><button aria-label="Remove" data-r="${idx}">×</button>`;ul.appendChild(li)});
- $('#empty').style.display=n?'none':'block';$('#total').textContent=fmt(t);$('#send').disabled=!n;
- $('#pc').textContent=n;updPill();
+ $('#empty').style.display=n?'none':'block';$('#clr').style.display=n?'block':'none';$('#total').textContent=fmt(t);$('#send').disabled=!n;
+ $('#pc').textContent=n;save();updPill();
 }
 $('#items').addEventListener('click',e=>{if(e.target.dataset.r!==undefined){cart.splice(+e.target.dataset.r,1);render()}});
-const panelEl=$('#panel');let panelSeen=false;
-function updPill(){$('#pill').classList.toggle('show',cart.length>0&&!panelSeen)}
-new IntersectionObserver(es=>{panelSeen=es[0].isIntersecting&&es[0].intersectionRatio>.6;updPill()},{threshold:[0,.6,1]}).observe(panelEl);
-function viewOrder(){
+const panelEl=$('#panel');
+function updPill(){const p=$('#pill'),had=p.classList.contains('on'),has=cart.length>0;p.classList.toggle('on',has);
+ if(has){p.classList.remove('bump');void p.offsetWidth;p.classList.add('bump')}}
+function scrollToOrder(){
  const hh=document.querySelector('header').offsetHeight;
  const target=window.matchMedia('(max-width:980px)').matches?panelEl:document.querySelector('.builder');
  const y=target.getBoundingClientRect().top+window.scrollY-hh-12;
  window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
  panelEl.classList.remove('flash');void panelEl.offsetWidth;panelEl.classList.add('flash');
+}
+function viewOrder(){
+ if(!$('#order').classList.contains('act')){
+  $('#menu').classList.remove('open');
+  $$('.pg').forEach(el=>el.classList.toggle('act',el.dataset.pg==='order'));
+  $$('#menu a').forEach(a=>a.classList.toggle('cur',a.getAttribute('href')==='#order'));
+  if(history.replaceState)history.replaceState(null,'','#order');
+  window.scrollTo(0,0);
+  setTimeout(scrollToOrder,120);
+ }else scrollToOrder();
 }
 $('#pill').onclick=viewOrder;
 
@@ -125,6 +141,9 @@ $$('[data-load]').forEach(a=>a.addEventListener('click',e=>{
 go(MAP[location.hash]?location.hash:'#top');
 $$('[data-load-ext]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();loader('Calling…',700,()=>{location.href=a.href;setTimeout(hide,1200)})}));
 $('#yr').textContent=new Date().getFullYear();
+loadCust();['#cname','#cloc'].forEach(s=>$(s).addEventListener('input',saveCust));
+$('#clr').onclick=()=>{if(cart.length&&confirm('Remove all items from your order?')){cart=[];render()}};
+render();$('#pill').classList.remove('bump');
 
 /* hero slideshow: mabati photos + logo + blue */
 const BG=['romantile','box-blue','tile-charcoal','versatile','box-brown','tile-grey','eurotile','box-teal','maroon-ridge-nails','corrugated'];
