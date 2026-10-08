@@ -247,3 +247,14 @@ header .nav ul a.cur{color:#fff}
 @media(max-width:380px){.cartfab .lbl{display:none}}
 
 .panel .clr{display:none;margin:.7rem auto 0;background:none;border:0;color:#ff8d86;font:600 .85rem 'Figtree';text-decoration:underline;cursor:pointer}
+
+/* ===== order drawer ===== */
+.builder{grid-template-columns:1fr!important}
+body.noscroll{overflow:hidden}
+.pback{position:fixed;inset:0;z-index:400;background:rgba(5,8,25,.6);backdrop-filter:blur(3px);opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+.pback.open{opacity:1;visibility:visible}
+.panel{position:fixed!important;z-index:401;top:0;right:0;bottom:0;width:min(420px,100%);border-radius:18px 0 0 18px;overflow-y:auto;overscroll-behavior:contain;transform:translateX(105%);visibility:hidden;transition:transform .38s cubic-bezier(.2,.9,.3,1),visibility .38s;padding-bottom:2rem}
+.panel.open{transform:none;visibility:visible}
+.panel .pclose{position:absolute;top:.7rem;right:.8rem;width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:1.6rem;line-height:1;cursor:pointer}
+.panel .items{max-height:none}
+@media(max-width:700px){.panel{top:auto;left:0;width:100%;max-height:88vh;border-radius:22px 22px 0 0;transform:translateY(105%)}.panel.open{transform:none}}
