@@ -11,7 +11,7 @@ const P=[
  {n:'Zee Tile',d:'Sharp tile pattern. Gauge 28 price on request.',img:'zee-tile',p:{30:500,28:null}}
 ];
 const COLORS=['Charcoal Grey','Royal Blue','Forest Green','Brick Red','Chocolate Brown','Maroon','Bright Red','Teal','Orange Red','White'];
-const G=[['box-blue','Royal blue box profile'],['box-green','Green box profile'],['box-brown','Chocolate brown box profile'],['orange','Orange-red corrugated'],['box-red','Bright red box profile'],['box-dark','Charcoal box profile'],['box-teal','Teal box profile'],['corrugated','Corrugated in three colours'],['box-maroon','Maroon box profile'],['box-white','White box profile'],['box-green2','Forest green box profile']];
+const G=[['box-blue','Royal blue box profile'],['box-green','Green box profile'],['box-brown','Chocolate brown box profile'],['orange','Orange-red corrugated'],['box-red','Bright red box profile'],['box-dark','Charcoal box profile'],['box-teal','Teal box profile'],['corrugated','Corrugated in three colours'],['box-maroon','Maroon box profile'],['box-white','White box profile'],['box-green2','Forest green box profile'],['tile-charcoal','Charcoal textured tile sheet'],['maroon-ridge-nails','Maroon tile with ridge caps and roofing nails'],['tile-grey','Grey tile profile']];
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const fmt=n=>'Ksh '+n.toLocaleString('en-KE');
 let cart=[];
@@ -86,15 +86,44 @@ $('#gal').addEventListener('click',e=>{const f=e.target.closest('figure');if(f){
 $('#lb').onclick=()=>$('#lb').classList.remove('on');
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#lb').classList.remove('on')});
 
-/* nav + loader on tap */
-function go(h){const el=document.querySelector(h);if(el)el.scrollIntoView({behavior:'smooth'})}
+/* pages: one screen at a time, no endless scrolling */
+const MAP={'#top':'home','#why':'home','#order':'order','#prices':'prices','#gallery':'gallery','#contact':'contact','#panel':'order'};
+function showPage(name,anchor){
+ $$('.pg').forEach(el=>el.classList.toggle('act',el.dataset.pg===name));
+ $$('#menu a').forEach(a=>a.classList.toggle('cur',MAP[a.getAttribute('href')]===name&&(name!=='home'||a.getAttribute('href')==='#why'&&anchor==='#why')));
+ const t=anchor&&anchor!=='#top'&&anchor!=='#order'&&anchor!=='#prices'&&anchor!=='#gallery'&&anchor!=='#contact'?document.querySelector(anchor):null;
+ if(t)t.scrollIntoView({behavior:'smooth'});else window.scrollTo({top:0,behavior:'smooth'});
+ if(history.replaceState)history.replaceState(null,'','#'+(anchor?anchor.slice(1):name));
+}
+function go(h){showPage(MAP[h]||'home',h)}
 $('#burger').onclick=()=>$('#menu').classList.toggle('open');
 $$('[data-load]').forEach(a=>a.addEventListener('click',e=>{
  e.preventDefault();$('#menu').classList.remove('open');const h=a.getAttribute('href');
- loader('One moment…',600,()=>{go(h);setTimeout(hide,250)});
+ loader('One moment…',450,()=>{go(h);setTimeout(hide,200)});
 }));
+go(MAP[location.hash]?location.hash:'#top');
 $$('[data-load-ext]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();loader('Calling…',700,()=>{location.href=a.href;setTimeout(hide,1200)})}));
 $('#yr').textContent=new Date().getFullYear();
+
+/* hero slideshow: mabati photos + logo + blue */
+const BG=['romantile','box-blue','tile-charcoal','versatile','box-brown','tile-grey','eurotile','box-teal','maroon-ridge-nails','corrugated'];
+$('#bgshow').innerHTML=BG.map(n=>`<img src="images/${n}.jpg" alt="">`).join('');
+const SL=[{logo:1},{i:'romantile',t:'Royal blue romantile'},{i:'box-brown',t:'Chocolate brown box profile'},{i:'versatile',t:'Green versatile tile'},{i:'box-blue',t:'Blue box profile'},{logo:1},{i:'eurotile',t:'Eurotile'},{i:'tile-charcoal',t:'Charcoal textured tile sheet'},{i:'maroon-ridge-nails',t:'Maroon tile with ridge caps and nails'},{i:'tile-grey',t:'Grey tile profile'},{i:'box-red',t:'Bright red box profile'}];
+$('#slides').innerHTML=SL.map(x=>x.logo?`<div class="slide logo-slide"><img src="images/logo.jpg" alt="Maisha Mabati logo"></div>`:`<div class="slide"><img class="ph" src="images/${x.i}.jpg" alt="${x.t}"></div>`).join('');
+$('#dots').innerHTML=SL.map((_,i)=>`<button aria-label="Slide ${i+1}"></button>`).join('');
+const bgs=$$('#bgshow img'),sls=$$('#slides .slide'),dts=$$('#dots button');
+let bi=0,si=0,timer;
+function setBg(n){bgs.forEach((e,k)=>e.classList.toggle('on',k===n))}
+function setSl(n){si=(n+sls.length)%sls.length;sls.forEach((e,k)=>e.classList.toggle('on',k===si));dts.forEach((e,k)=>e.classList.toggle('on',k===si))}
+function play(){clearInterval(timer);timer=setInterval(()=>{setSl(si+1);bi=(bi+1)%bgs.length;setBg(bi)},3600)}
+setBg(0);setSl(0);play();
+dts.forEach((d,k)=>d.addEventListener('click',()=>{setSl(k);play()}));
+$('#show').addEventListener('mouseenter',()=>clearInterval(timer));$('#show').addEventListener('mouseleave',play);
+
+/* logo tilt effect */
+const lf=$('#logofx'),lg=lf.querySelector('.logo-big');
+lf.addEventListener('mousemove',e=>{const r=lf.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;lg.style.transform=`rotateY(${x*16}deg) rotateX(${-y*16}deg) scale(1.03)`});
+lf.addEventListener('mouseleave',()=>lg.style.transform='');
 
 /* reveal + whatsapp tip */
 const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.12});
