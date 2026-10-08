@@ -72,7 +72,7 @@ function render(){
  cart.forEach((k,idx)=>{const pr=price(P[k.i],k.g,k.l),s=pr*k.m;t+=s;n++;
   const li=document.createElement('li');
   li.innerHTML=`<span><b>${desc(k)}</b>${k.col} · ${qtxt(k)} × ${fmt(pr)}<br>${fmt(s)}</span><button aria-label="Remove" data-r="${idx}">×</button>`;ul.appendChild(li)});
- $('#empty').style.display=n?'none':'block';$('#clr').style.display=n?'block':'none';$('#total').textContent=fmt(t);$('#send').disabled=!n;
+ $('#empty').style.display=n?'none':'block';$('#clr').style.display=n?'flex':'none';$('#total').textContent=fmt(t);$('#send').disabled=!n;
  $('#pc').textContent=n;save();updPill();
 }
 $('#items').addEventListener('click',e=>{if(e.target.dataset.r!==undefined){cart.splice(+e.target.dataset.r,1);render()}});
@@ -87,7 +87,7 @@ function viewOrder(){
  loader('Opening your order…',650,()=>{openPanel();setTimeout(hide,150)});
 }
 $('#pclose').onclick=closePanel;$('#pback').onclick=closePanel;
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#cdlg').classList.contains('open'))$('#cdlg').classList.remove('open');else closePanel()}});
 $('#pill').onclick=viewOrder;
 
 function openWA(text,txt){
@@ -134,7 +134,10 @@ go(MAP[location.hash]?location.hash:'#top');
 $$('[data-load-ext]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();loader('Calling…',700,()=>{location.href=a.href;setTimeout(hide,1200)})}));
 $('#yr').textContent=new Date().getFullYear();
 loadCust();['#cname','#cloc'].forEach(s=>$(s).addEventListener('input',saveCust));
-$('#clr').onclick=()=>{if(cart.length&&confirm('Remove all items from your order?')){cart=[];render()}};
+const cd=$('#cdlg'),cdClose=()=>{cd.classList.remove('open');cd.setAttribute('aria-hidden','true')};
+$('#clr').onclick=()=>{if(!cart.length)return;const n=cart.length;$('#cmsg').textContent=`This will remove ${n} item${n>1?'s':''} from your order.`;cd.classList.add('open');cd.setAttribute('aria-hidden','false')};
+$('#cno').onclick=cdClose;cd.onclick=e=>{if(e.target===cd)cdClose()};
+$('#cyes').onclick=()=>{cart=[];render();cdClose();closePanel()};
 render();$('#pill').classList.remove('bump');
 
 /* hero slideshow: mabati photos + logo + blue */
