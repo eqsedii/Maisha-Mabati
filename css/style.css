@@ -106,8 +106,6 @@ select:focus,input:focus,textarea:focus{border-color:var(--royal);outline:0;box-
 .panel .note{font-size:.78rem;color:var(--cream2);margin-top:.7rem}
 .panel .btn{width:100%;font-size:1.05rem}
 .panel .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.pill{position:fixed;left:16px;bottom:18px;z-index:90;background:var(--red);color:#fff;border:0;border-radius:999px;padding:.7rem 1.2rem;font:700 .95rem 'Figtree';box-shadow:var(--shadow);cursor:pointer;display:none}
-.pill.show{display:block;animation:rise .4s both}
 /* prices */
 .dark{background:var(--navy);color:#fff}
 .tables{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem}
@@ -234,3 +232,18 @@ header .nav ul a.cur{color:#fff}
 .tbl.wide tr.th td{font-weight:700;color:var(--cream2);background:rgba(255,255,255,.06)}
 .panel.flash{animation:flash 1.2s ease}
 @keyframes flash{0%,100%{box-shadow:var(--shadow)}30%{box-shadow:0 0 0 5px var(--red),var(--shadow)}}
+
+/* ===== floating cart button ===== */
+.cartfab{position:fixed;left:16px;bottom:18px;z-index:210;display:none;align-items:center;gap:.6rem;background:var(--red);color:#fff;border:0;border-radius:999px;padding:.75rem 1.1rem .75rem .95rem;font:700 .95rem 'Figtree',sans-serif;cursor:pointer;box-shadow:0 12px 28px -8px rgba(223,10,2,.8);-webkit-tap-highlight-color:transparent}
+.cartfab.on{display:inline-flex;animation:fabin .45s cubic-bezier(.2,1.4,.4,1) both}
+.cartfab::before{content:"";position:absolute;inset:0;border-radius:inherit;background:var(--red);z-index:-1;animation:rip 2.4s ease-out infinite}
+.cartfab svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cartfab b{min-width:24px;height:24px;padding:0 6px;border-radius:99px;background:#fff;color:var(--red);display:grid;place-items:center;font-size:.85rem}
+.cartfab:active{transform:scale(.95)}
+.cartfab.bump svg{animation:cartbump .6s ease}
+.cartfab.bump b{animation:cartbump .6s ease}
+@keyframes fabin{from{opacity:0;transform:translateY(30px) scale(.7)}to{opacity:1;transform:none}}
+@keyframes cartbump{30%{transform:scale(1.35) rotate(-12deg)}60%{transform:scale(.9) rotate(6deg)}}
+@media(max-width:380px){.cartfab .lbl{display:none}}
+
+.panel .clr{display:none;margin:.7rem auto 0;background:none;border:0;color:#ff8d86;font:600 .85rem 'Figtree';text-decoration:underline;cursor:pointer}
